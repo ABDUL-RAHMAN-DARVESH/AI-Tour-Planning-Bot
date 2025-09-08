@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Travel Guide for Indians — Royal Luxe</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ========== Royal Luxe Design System ========== */
+    :root{
+      --royal-bg-1:#35155D;
+      --royal-bg-2:#512B81;
+      --royal-bg-3:#4477CE;
+      --royal-ink:#101828;
+      --text-muted:#475467;
+      --glass-bg:rgba(255,255,255,0.08);
+      --glass-stroke:rgba(255,255,255,0.28);
+      --card-glass-1:rgba(255,255,255,0.26);
+      --card-glass-2:rgba(255,255,255,0.18);
+      --gold:#D4AF37;
+      --gold-2:#EAB308;
+      --emerald:#10b981;
+      --amber:#f59e0b;
+      --danger:#dc2626;
+      --shadow-xl:0 24px 80px rgba(0,0,0,0.25);
+      --shadow-lg:0 16px 40px rgba(0,0,0,0.18);
+      --easing: cubic-bezier(0.19,1,0.22,1); /* expo-out */
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
+    /* Background: velvet gradient + noise + dynamic aurora */
+    body{
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      min-height: 100vh;
+      display:flex; justify-content:center; align-items:center;
+      padding: 20px;
+      overflow-x:hidden;
+      color: var(--royal-ink);
+      background:
+        radial-gradient(1200px 800px at 70% -10%, rgba(255,255,255,0.08), transparent 70%),
+        linear-gradient(135deg, var(--royal-bg-1) 0%, var(--royal-bg-2) 55%, var(--royal-bg-3) 100%);
+      position: relative;
+      transition: background-position .6s var(--easing);
+    }
+    /* Subtle noise */
+    body::after{
+      content:'';
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" opacity="0.04"><filter id="n"><feTurbulence baseFrequency="0.8" numOctaves="4" seed="2"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+    }
+
+    /* Container: glass luxe */
+    .container{
+      position: relative;
+      z-index:1;
+      width:100%; max-width:1000px; height: 85vh;
+      display:flex; flex-direction:column; overflow:hidden;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.10));
+      border: 1px solid var(--glass-stroke);
+      backdrop-filter: blur(24px);
+      box-shadow: var(--shadow-xl);
+      animation: floatSoft 9s var(--easing) infinite;
+    }
+    @keyframes floatSoft{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+    /* Header: aurora + luxe type */
+    .header{
+      position: relative;
+      padding: 26px;
+      text-align:center;
+      color: white;
+      overflow:hidden;
+      background: linear-gradient(135deg, #6B21A8, #7C3AED, #2563EB);
+      background-size: 200% 200%;
+      animation: headerShift 10s var(--easing) infinite alternate;
+    }
+    @keyframes headerShift{
+      0%{ background-position: 0% 50%; }
+      100%{ background-position: 100% 50%; }
+    }
+    .header::after{
+      content:'';
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 140deg, rgba(212,175,55,0.18), transparent, rgba(255,255,255,0.10), transparent);
+      animation: aurora 12s var(--easing) infinite alternate;
+      filter: blur(44px);
+      pointer-events:none;
+    }
+    @keyframes aurora{
+      0%{ transform: translate(-10%, -10%) rotate(0deg) }
+      100%{ transform: translate(12%, 14%) rotate(22deg) }
+    }
+    .header h1{
+      font-family:'Playfair Display', serif;
+      font-size: 30px;
+      letter-spacing: 0.4px;
+      text-shadow: 0 8px 30px rgba(0,0,0,0.35);
+    }
+    .header p{
+      margin-top:8px;
+      font-size: 15.5px;
+      opacity:0.95;
+    }
+
+    /* Status pill */
+    .status{
+      position:absolute; top: 18px; right: 22px;
+      display:flex; align-items:center; gap:8px;
+      font-size: 12.5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.23);
+      border:1px solid rgba(255,255,255,0.35);
+      backdrop-filter: blur(10px);
+      color: #fff;
+    }
+    .status-dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--emerald);
+      animation: statusPulse 2.2s infinite;
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.6);
+    }
+    @keyframes statusPulse{
+      0%{ box-shadow: 0 0 0 0 rgba(16,185,129,0.45) }
+      70%{ box-shadow: 0 0 0 8px rgba(16,185,129,0) }
+      100%{ box-shadow: 0 0 0 0 rgba(16,185,129,0) }
+    }
+
+    /* Instructions toggle */
+    .instructions-toggle{
+      position:absolute; top:18px; left:22px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: white;
+      padding: 8px 12px; border-radius: 999px;
+      cursor: pointer; font-size: 12.5px;
+      backdrop-filter: blur(10px);
+      transition: transform .25s var(--easing), background .25s var(--easing);
+    }
+    .instructions-toggle:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.28); }
+
+    /* Instructions panel */
+    .instructions-panel{
+      background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(246,246,250,0.9));
+      margin: 14px; border-radius: 16px; padding: 18px;
+      border: 1px solid rgba(255,255,255,0.5);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+      max-height: 0; overflow:hidden; opacity:0;
+      transition: all .55s var(--easing);
+    }
+    .instructions-panel.open{ max-height: 320px; opacity:1; margin-bottom: 18px; }
+    .instruction-item{
+      display:flex; align-items:center; gap:14px;
+      margin: 10px 0; padding: 12px 12px;
+      background: linear-gradient(180deg, var(--card-glass-1), var(--card-glass-2));
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transform: translateX(-36px); opacity:0;
+      animation: slideInLeft .6s var(--easing) forwards;
+    }
+    .instruction-item:nth-child(1){ animation-delay:.07s }
+    .instruction-item:nth-child(2){ animation-delay:.14s }
+    .instruction-item:nth-child(3){ animation-delay:.21s }
+    .instruction-item:nth-child(4){ animation-delay:.28s }
+    @keyframes slideInLeft{ to{ transform:translateX(0); opacity:1 } }
+    .instruction-icon{ font-size:22px; }
+
+    /* Chat container */
+    .chat-container{ flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .messages{
+      flex:1; padding: 20px; overflow-y:auto;
+      background: linear-gradient(135deg, rgba(248,250,252,0.85) 0%, rgba(241,245,249,0.85) 100%);
+      background-attachment: fixed;
+    }
+    .messages::-webkit-scrollbar{ width:8px }
+    .messages::-webkit-scrollbar-track{ background: rgba(241,245,249,0.55); border-radius:4px }
+    .messages::-webkit-scrollbar-thumb{
+      background: linear-gradient(135deg, #d7dbe4, #a7b2c8);
+      border-radius:4px;
+    }
+
+    .message{ margin-bottom: 18px; animation: messageIn .58s var(--easing); }
+    @keyframes messageIn{
+      0%{ opacity:0; transform: translateY(14px) scale(0.985) }
+      100%{ opacity:1; transform: translateY(0) scale(1) }
+    }
+    .message.user{ text-align:right; }
+    .message.bot{ text-align:left; }
+
+    .message-content{
+      display:inline-block; max-width: 80%;
+      padding: 15px 18px; border-radius: 18px;
+      font-size: 15px; line-height:1.55; word-wrap: break-word; position:relative;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.12);
+      transition: transform .35s var(--easing), box-shadow .35s var(--easing);
+    }
+    .message .message-content:hover{ transform: translateY(-2px); box-shadow: 0 18px 48px rgba(0,0,0,0.16); }
+
+    .message.user .message-content{
+      color: #fff;
+      background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 45%, #2563EB 100%);
+      background-size: 220% 220%; animation: bubbleShift 6s var(--easing) infinite alternate;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    @keyframes bubbleShift{
+      0%{ background-position: 0% 50% }
+      100%{ background-position: 100% 50% }
+    }
+    .message.user .message-content::after{
+      content:''; position:absolute; right:-8px; top: 14px; width:0;height:0;
+      border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:8px solid #5B21B6;
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.15));
+    }
+
+    .message.bot .message-content{
+      background: linear-gradient(180deg, var(--card-glass-1), var(--card-glass-2));
+      color: #1f2937;
+      border: 1px solid rgba(203,213,225,0.45);
+      backdrop-filter: blur(12px);
+    }
+    .message.bot .message-content::before{
+      content:''; position:absolute; left:-8px; top: 14px; width:0;height:0;
+      border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:8px solid rgba(255,255,255,0.95);
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.12));
+    }
+
+    /* Typing indicator */
+    .typing{
+      display:flex; align-items:center; gap:8px;
+      padding: 12px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.55));
+      border-radius: 16px;
+      border: 1px solid rgba(203,213,225,0.45);
+      max-width: 120px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+      animation: glowPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes glowPulse{
+      0%,100%{ box-shadow: 0 0 0 rgba(212,175,55,0) }
+      50%{ box-shadow: 0 0 26px rgba(212,175,55,0.25) }
+    }
+    .typing-dots{ display:flex; gap:6px }
+    .typing-dot{
+      width:8px;height:8px;border-radius:50%;
+      background: linear-gradient(135deg, #94a3b8, #64748b);
+      animation: typingBounce 1.3s infinite ease-in-out;
+    }
+    .typing-dot:nth-child(1){ animation-delay: -0.28s }
+    .typing-dot:nth-child(2){ animation-delay: -0.14s }
+    @keyframes typingBounce{
+      0%,80%,100%{ transform: translateY(0) scale(0.85); opacity:0.55 }
+      40%{ transform: translateY(-8px) scale(1); opacity:1 }
+    }
+
+    /* Quick actions */
+    .quick-actions{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; justify-content:center; }
+    .quick-btn{
+      background: linear-gradient(135deg, #F3F0E6, #E8E2D0);
+      border: 1px solid rgba(212,175,55,0.45);
+      color:#3a2f1b;
+      padding: 12px 14px; border-radius: 18px; font-size: 13px;
+      cursor:pointer; transition: transform .3s var(--easing), box-shadow .3s var(--easing), background .3s var(--easing);
+      box-shadow: 0 8px 22px rgba(212,175,55,0.20);
+      position:relative; overflow:hidden;
+    }
+    .quick-btn::after{
+      content:''; position:absolute; top:0; left:-150%; width:50%; height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+      transform: skewX(-20deg); transition:left .9s var(--easing);
+    }
+    .quick-btn:hover{ transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 36px rgba(212,175,55,0.35); }
+    .quick-btn:hover::after{ left: 150%; }
+
+    .quick-btn.sos{
+      background: linear-gradient(135deg, #b91c1c, #ef4444);
+      color: white; border: 1px solid rgba(255,255,255,0.35);
+      animation: sosGlow 2.2s infinite;
+      box-shadow: 0 10px 30px rgba(239,68,68,0.35);
+    }
+    @keyframes sosGlow{
+      0%,100%{ box-shadow: 0 8px 22px rgba(239,68,68,0.25) }
+      50%{ box-shadow: 0 12px 34px rgba(239,68,68,0.45), 0 0 18px rgba(239,68,68,0.32) }
+    }
+
+    /* Input area */
+    .input-container{
+      padding: 22px; background: rgba(255,255,255,0.92);
+      border-top: 1px solid rgba(203,213,225,0.35);
+      display:flex; gap: 14px; align-items:flex-end;
+      backdrop-filter: blur(18px);
+    }
+    .input-wrapper{ flex:1; position:relative; }
+    .message-input{
+      width:100%; min-height: 52px; max-height: 130px;
+      padding: 14px 98px 14px 18px;
+      border: 2px solid rgba(203,213,225,0.45); border-radius: 22px;
+      font-size: 15px; resize:none; outline:none;
+      transition: all .28s var(--easing);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+    }
+    .message-input:focus{
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(212,175,55,0.18);
+      background:white;
+    }
+    .action-buttons{
+      position:absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      display:flex; gap:6px;
+    }
+    .action-btn{
+      background:none; border:none; color:#6b7280; cursor:pointer;
+      padding: 8px; border-radius: 50%;
+      transition: transform .25s var(--easing), background .25s var(--easing), color .25s var(--easing);
+      font-size: 16px;
+    }
+    .action-btn:hover{ color:#6B21A8; background: rgba(102,126,234,0.10); transform: scale(1.08) }
+
+    .action-btn.sos-btn{ color:#ef4444; }
+    .action-btn.sos-btn:hover{ color:#f87171; background: rgba(239,68,68,0.10) }
+
+    .send-btn{
+      width: 52px; height: 52px; border-radius: 50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      color:white; background: linear-gradient(135deg, #B98C2C, var(--gold));
+      box-shadow: 0 10px 30px rgba(212,175,55,0.45);
+      transition: transform .28s var(--easing), box-shadow .28s var(--easing);
+      position:relative; overflow:hidden;
+    }
+    .send-btn:hover{ transform: scale(1.07) rotate(4deg); box-shadow: 0 14px 42px rgba(212,175,55,0.6); }
+    .send-btn::after{
+      content:'';
+      position:absolute; top:0; left:-150%; width:50%; height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+      transform: skewX(-18deg);
+      transition:left .9s var(--easing);
+    }
+    .send-btn:hover::after{ left: 150% }
+    .send-btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+
+    /* Info banners */
+    .error-message, .success-message{
+      padding: 14px; border-radius: 12px; margin: 12px 18px; font-size:14px;
+      animation: messageIn .5s var(--easing);
+      border: 1px solid transparent;
+    }
+    .error-message{ background: linear-gradient(135deg, #fee2e2, #fecaca); color: #b91c1c; border-color: rgba(220,38,38,0.28); }
+    .success-message{ background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border-color: rgba(5,150,105,0.28); }
+
+    /* Modal */
+    .modal{
+      position: fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      z-index: 1000; opacity:0; visibility:hidden;
+      transition: opacity .3s var(--easing), visibility .3s var(--easing);
+      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.45);
+    }
+    .modal.open{ opacity:1; visibility:visible; }
+    .modal-content{
+      background: linear-gradient(180deg, rgba(255,255,255,0.26), rgba(255,255,255,0.18));
+      border-radius: 18px; padding: 26px; width: 90%; max-width: 520px;
+      box-shadow: 0 26px 90px rgba(0,0,0,0.35);
+      transform: scale(0.94); transition: transform .3s var(--easing);
+      border: 1px solid rgba(255,255,255,0.28);
+      backdrop-filter: blur(28px);
+    }
+    .modal.open .modal-content{ transform: scale(1) }
+    .modal-header{ text-align:center; margin-bottom: 16px; color:#111827; }
+    .modal-header h3{ font-family:'Playfair Display',serif; font-size:22px; margin-bottom: 8px; }
+
+    .form-group{ margin-bottom: 16px; }
+    .form-group label{ display:block; margin-bottom: 8px; color:#1f2937; font-weight:600; font-size: 14px; }
+    .form-group input{
+      width:100%; padding: 12px; border: 1.6px solid rgba(229,231,235,0.95); border-radius: 10px; font-size:14px;
+      transition: border-color .25s var(--easing), box-shadow .25s var(--easing);
+      background: rgba(255,255,255,0.82);
+    }
+    .form-group input:focus{
+      outline:none; border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(212,175,55,0.18);
+      background:white;
+    }
+
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top: 8px; }
+    .btn{
+      padding: 10px 18px; border:none; border-radius: 10px; cursor:pointer; font-size:14px;
+      transition: transform .2s var(--easing), box-shadow .2s var(--easing), background .2s var(--easing);
+    }
+    .btn:hover{ transform: translateY(-2px); }
+    .btn-secondary{ background:#f3f4f6; color:#1f2937; }
+    .btn-primary{
+      background: linear-gradient(135deg, #B98C2C, var(--gold)); color:white;
+      box-shadow: 0 10px 30px rgba(212,175,55,0.35);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* Rich message formatting */
+    .message-content h3{ color:#111827; margin-bottom: 10px; font-weight:700; }
+    .message-content ul{ margin: 10px 0; padding-left: 20px; }
+    .message-content li{ margin: 6px 0; }
+    .message-content a{ color:#6B21A8; text-decoration:none; transition: color .2s }
+    .message-content a:hover{ color:#7C3AED; text-decoration: underline; }
+    .message-content strong{ color:#0f172a }
+    .message-content code{
+      background: rgba(17,24,39,0.06);
+      padding: 3px 6px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    /* Image styling in messages */
+    .message-content img{
+      transition: transform .3s var(--easing), box-shadow .3s var(--easing);
+      cursor: pointer;
+    }
+    .message-content img:hover{
+      transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 768px){
+      .container{ height: 100vh; border-radius: 0; max-width:100%; }
+      .header h1{ font-size: 24px; }
+      .message-content{ max-width: 90%; }
+      .quick-actions{ gap:8px }
+      .quick-btn{ padding: 10px 12px; font-size:12px }
+      body{ padding:0 }
+      .instructions-toggle{ position: static; margin-bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="instructions-toggle" onclick="toggleInstructions()">How to Use</button>
+      <h1>AI Travel Guide for Indians</h1>
+      <p>Plan your perfect trip with real-time data & Indian travel insights</p>
+      <div class="status">
+        <div class="status-dot"></div>
+        <span id="connectionStatus">Connected</span>
+      </div>
+    </div>
+
+    <div class="instructions-panel" id="instructionsPanel">
+      <div class="instruction-item">
+        <div class="instruction-icon">🌤️</div>
+        <div><strong>Weather Queries:</strong> Ask "Weather in Mumbai" or "What's the weather like in Goa tomorrow?"</div>
+      </div>
+      <div class="instruction-item">
+        <div class="instruction-icon">🏛️</div>
+        <div><strong>Places to Visit:</strong> Try "Best places in Rajasthan" or "Tourist attractions in Kerala"</div>
+      </div>
+      <div class="instruction-item">
+        <div class="instruction-icon">🏨</div>
+        <div><strong>Hotels & Budget:</strong> Ask "Hotels in Bangalore" or "Budget for 5 days in Manali"</div>
+      </div>
+      <div class="instruction-item">
+        <div class="instruction-icon">🆘</div>
+        <div><strong>Emergency SOS:</strong> Setup emergency contacts first, then use red SOS button for instant alerts</div>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="quick-actions">
+          <button class="quick-btn" data-action="weather">🌤️ Weather</button>
+          <button class="quick-btn" data-action="hotels">🏨 Hotels</button>
+          <button class="quick-btn" data-action="places">🏛️ Places</button>
+          <button class="quick-btn" data-action="budget">💰 Budget</button>
+          <button class="quick-btn sos" onclick="setupEmergencyContacts()">🆘 Setup SOS</button>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="input-wrapper">
+          <textarea id="messageInput" class="message-input" placeholder="Ask about travel destinations, weather, hotels, or emergency help..." rows="1"></textarea>
+          <div class="action-buttons">
+            <button class="action-btn" id="locationBtn" title="Share Location">📍</button>
+            <button class="action-btn sos-btn" id="sosBtn" title="Emergency SOS">🆘</button>
+          </div>
+        </div>
+        <button class="send-btn" id="sendBtn" title="Send Message" disabled>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Emergency Contact Setup Modal -->
+  <div class="modal" id="contactModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🆘 Setup Emergency Contact</h3>
+        <p>Add emergency contacts for SOS alerts</p>
+      </div>
+      <form id="contactForm">
+        <div class="form-group">
+          <label for="contactName">Contact Name</label>
+          <input type="text" id="contactName" placeholder="Enter contact name" required>
+        </div>
+        <div class="form-group">
+          <label for="contactNumber">Phone Number</label>
+          <input type="tel" id="contactNumber" placeholder="+91 9876543210" required>
+        </div>
+        <div class="form-group">
+          <label for="contactRelation">Relation</label>
+          <input type="text" id="contactRelation" placeholder="Father, Mother, Friend, etc." required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeContactModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* Cursor parallax spotlight and reduced motion respect */
+    (function(){
+      const bodyEl = document.body;
+      let raf = null;
+      const onMove = (e)=>{
+        if(raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(()=>{
+          bodyEl.style.backgroundPosition = (e.clientX/22) + 'px ' + (e.clientY/22) + 'px, center';
+        });
+      };
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!prefersReduced){
+        document.addEventListener('mousemove', onMove);
+      }else{
+        document.documentElement.style.setProperty('--easing','ease-out');
+        // Minimize animations for reduced motion users
+        document.querySelectorAll('*').forEach(el=>{ el.style.animationDuration='0s'; });
+      }
+    })();
+
+    class TravelChatApp {
+      constructor() {
+        this.ws = null;
+        this.userId = this.generateUserId();
+        this.messageInput = document.getElementById('messageInput');
+        this.sendBtn = document.getElementById('sendBtn');
+        this.messages = document.getElementById('messages');
+        this.locationBtn = document.getElementById('locationBtn');
+        this.connectionStatus = document.getElementById('connectionStatus');
+        this.userLocation = null;
+
+        this.initializeEventListeners();
+        this.connectWebSocket();
+        this.setupAutoResize();
+        this.setupQuickActions();
+      }
+
+      generateUserId() {
+        return 'user_' + Math.random().toString(36).substr(2, 9);
+      }
+
+      initializeEventListeners() {
+        this.sendBtn.addEventListener('click', () => this.sendMessage());
+        this.locationBtn.addEventListener('click', () => this.shareLocation());
+        document.getElementById('sosBtn').addEventListener('click', () => this.handleSOS());
+
+        this.messageInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            this.sendMessage();
+          }
+        });
+
+        this.messageInput.addEventListener('input', () => {
+          this.sendBtn.disabled = !this.messageInput.value.trim();
+        });
+      }
+
+      setupQuickActions() {
+        const quickButtons = document.querySelectorAll('.quick-btn[data-action]');
+        quickButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const action = btn.getAttribute('data-action');
+            this.handleQuickAction(action);
+          });
+        });
+      }
+
+      handleQuickAction(action) {
+        const location = prompt(`Enter location for ${action}:`);
+
+        if (!location || !location.trim()) {
+          this.showMessage('Location is required for this query!', 'error');
+          return;
+        }
+
+        let message = '';
+
+        switch(action) {
+          case 'weather':
+            message = `Weather in ${location}`;
+            break;
+          case 'hotels':
+            message = `Hotels in ${location}`;
+            break;
+          case 'places':
+            message = `Places to visit in ${location}`;
+            break;
+          case 'budget':
+            const days = prompt('How many days?') || '3';
+            const date = prompt('Travel date (optional):') || '';
+            message = `Budget for ${days} days trip to ${location}${date ? ' on ' + date : ''}`;
+            break;
+        }
+
+        if (message) {
+          this.messageInput.value = message;
+          this.sendBtn.disabled = false;
+          this.sendMessage();
+        }
+      }
+
+      setupAutoResize() {
+        this.messageInput.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 130) + 'px';
+        });
+      }
+
+      connectWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/${this.userId}`;
+
+        this.ws = new WebSocket(wsUrl);
+
+        this.ws.onopen = () => {
+          this.updateConnectionStatus(true);
+          // Welcome
+          this.displayMessage("👋 Welcome! Ask about weather, hotels, places, or budgets. Share location for more precise tips.", 'bot');
+        };
+
+        this.ws.onmessage = (event) => {
+          this.displayMessage(event.data, 'bot');
+        };
+
+        this.ws.onclose = () => {
+          this.updateConnectionStatus(false);
+          setTimeout(() => this.connectWebSocket(), 2500);
+        };
+
+        this.ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          this.showMessage('Connection error. Retrying...', 'error');
+        };
+      }
+
+      updateConnectionStatus(connected) {
+        this.connectionStatus.textContent = connected ? 'Connected' : 'Reconnecting...';
+        this.connectionStatus.style.color = connected ? '#10b981' : '#f59e0b';
+      }
+
+      showTyping() {
+        this.hideTyping();
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot typing-indicator';
+        typingDiv.innerHTML = `
+          <div class="typing">
+            <div class="typing-dots">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        `;
+        this.messages.appendChild(typingDiv);
+        this.scrollToBottom();
+      }
+
+      hideTyping() {
+        const typing = this.messages.querySelector('.typing-indicator');
+        if (typing) typing.remove();
+      }
+
+      formatBotMessage(content) {
+        // Enhanced markdown-like to HTML with better image link handling
+        let formatted = content
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          // Handle clickable image links with enhanced styling
+          .replace(/\[🔗\s*(See Here|View Here|Check Photo|Look Here|View Picture)\]\(([^)]+)\)/gi, 
+            '<a href="$2" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#6B21A8,#7C3AED);color:white;text-decoration:none;padding:6px 12px;border-radius:8px;margin:2px 4px;font-size:12px;font-weight:500;transition:transform 0.2s ease;box-shadow:0 2px 8px rgba(107,33,168,0.3);" onmouseover="this.style.transform=\'scale(1.05)\';" onmouseout="this.style.transform=\'scale(1)\';">🔗 $1</a>')
+          // Handle regular image links without 🔗
+          .replace(/\[(See Here|View Here|Check Photo|Look Here|View Picture)\]\(([^)]+)\)/gi, 
+            '<a href="$2" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:white;text-decoration:none;padding:6px 12px;border-radius:8px;margin:2px 4px;font-size:12px;font-weight:500;transition:transform 0.2s ease;box-shadow:0 2px 8px rgba(16,185,129,0.3);" onmouseover="this.style.transform=\'scale(1.05)\';" onmouseout="this.style.transform=\'scale(1)\';">📸 $1</a>')
+          // Handle direct image URLs - convert to clickable links (no inline images)
+          .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+\.(jpg|jpeg|png|gif|webp)[^)]*)\)/gi, 
+            '<a href="$2" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;text-decoration:none;padding:6px 12px;border-radius:8px;margin:2px 4px;font-size:12px;font-weight:500;transition:transform 0.2s ease;box-shadow:0 2px 8px rgba(245,158,11,0.3);" onmouseover="this.style.transform=\'scale(1.05)\';" onmouseout="this.style.transform=\'scale(1)\';">🇮🇳 $1</a>')
+          // Handle regular links
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#6B21A8;text-decoration:none;font-weight:500;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';">🔗 $1</a>')
+          .replace(/\n/g, '<br>');
+        
+        // Enhanced section formatting with better psychology-aware styling
+        formatted = formatted.replace(
+          /(🎯|🌤️|🏛️|🏨|🍛|📸|📰|💰|📋|🗺️|💡|⚠️|🆘|🧠)(.+?)(?=<br>|$)/g,
+          '<div style="margin:12px 0;padding:14px;background:linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95));border-radius:12px;border-left:4px solid #B98C2C;box-shadow:0 2px 8px rgba(0,0,0,0.1);"><strong>$1$2</strong></div>'
+        );
+        
+        return formatted;
+      }
+
+      displayMessage(content, sender) {
+        this.hideTyping();
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+
+        if (sender === 'bot') {
+          contentDiv.innerHTML = this.formatBotMessage(content);
+        } else {
+          contentDiv.textContent = content;
+        }
+
+        messageDiv.appendChild(contentDiv);
+        this.messages.insertBefore(messageDiv, this.messages.querySelector('.typing-indicator'));
+        this.scrollToBottom();
+      }
+
+      sendMessage() {
+        const message = this.messageInput.value.trim();
+        if (!message || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+
+        // Add location hint if available
+        let finalMessage = message;
+        if (this.userLocation) {
+          finalMessage = `[LIVE_LOCATION] lat=${this.userLocation.lat} lon=${this.userLocation.lon} ${message}`;
+        }
+
+        this.displayMessage(message, 'user');
+        this.showTyping();
+        this.ws.send(finalMessage);
+        this.messageInput.value = '';
+        this.messageInput.style.height = 'auto';
+        this.sendBtn.disabled = true;
+      }
+
+      shareLocation() {
+        if (!navigator.geolocation) {
+          this.showMessage('Geolocation not supported by browser', 'error');
+          return;
+        }
+
+        this.locationBtn.style.opacity = '0.6';
+        this.locationBtn.textContent = '🔍';
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.userLocation = { lat: position.coords.latitude, lon: position.coords.longitude };
+            this.locationBtn.style.opacity = '1';
+            this.locationBtn.textContent = '✅';
+            this.showMessage('Location shared successfully', 'success');
+            setTimeout(() => { this.locationBtn.textContent = '📍'; }, 1800);
+          },
+          () => {
+            this.locationBtn.style.opacity = '1';
+            this.locationBtn.textContent = '❌';
+            this.showMessage('Location access denied or unavailable', 'error');
+            setTimeout(() => { this.locationBtn.textContent = '📍'; }, 1800);
+          }
+        );
+      }
+
+      showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+        messageDiv.textContent = message;
+
+        const quickActions = this.messages.querySelector('.quick-actions');
+        if (quickActions) {
+          quickActions.insertAdjacentElement('afterend', messageDiv);
+        } else {
+          this.messages.appendChild(messageDiv);
+        }
+
+        this.scrollToBottom();
+        setTimeout(() => { if (messageDiv.parentNode) messageDiv.remove(); }, 4500);
+      }
+
+      scrollToBottom() {
+        this.messages.scrollTop = this.messages.scrollHeight;
+      }
+
+      async handleSOS() {
+        const sosBtn = document.getElementById('sosBtn');
+        const originalText = sosBtn.textContent;
+
+        // Loading state
+        sosBtn.style.opacity = '0.55';
+        sosBtn.textContent = '⏳';
+        sosBtn.disabled = true;
+
+        try {
+          let locationData = null;
+          if (this.userLocation) {
+            locationData = { lat: this.userLocation.lat, lon: this.userLocation.lon };
+          }
+
+          const response = await fetch(`/api/sos/${this.userId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(locationData)
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+            sosBtn.textContent = '✅';
+            this.displayMessage('🚨 EMERGENCY ALERT SENT! ' + result.message, 'bot');
+            burst(sosBtn); // Luxe micro-celebration
+          } else if (result.status === 'partial') {
+            sosBtn.textContent = '⚠️';
+            this.displayMessage('⚠️ Partial SOS Success: ' + result.message, 'bot');
+          } else {
+            sosBtn.textContent = '❌';
+            this.displayMessage('❌ SOS Failed: ' + result.message, 'bot');
+          }
+        } catch (error) {
+          sosBtn.textContent = '❌';
+          this.displayMessage('❌ SOS Error: Unable to send emergency alert', 'bot');
+          console.error('SOS Error:', error);
+        }
+
+        setTimeout(() => {
+          sosBtn.style.opacity = '1';
+          sosBtn.textContent = originalText;
+          sosBtn.disabled = false;
+        }, 2200);
+      }
+    }
+
+    // Shimmer confetti micro-interaction
+    function burst(el){
+      const n = 14;
+      const rect = el.getBoundingClientRect();
+      for(let i=0;i<n;i++){
+        const d=document.createElement('span');
+        d.style.position='fixed';
+        d.style.left = (rect.left + rect.width/2)+'px';
+        d.style.top = (rect.top + rect.height/2)+'px';
+        d.style.width=d.style.height='6px';
+        d.style.borderRadius='50%';
+        d.style.background = ['#D4AF37','#F59E0B','#22C55E','#60A5FA'][i%4];
+        d.style.transform = `translate(-50%,-50%)`;
+        d.style.transition='transform .9s cubic-bezier(.17,.67,.32,1.34), opacity .9s ease';
+        d.style.zIndex='2000';
+        document.body.appendChild(d);
+        requestAnimationFrame(()=>{
+          d.style.transform = `translate(${(Math.random()*2-1)*120}px, ${(Math.random()*2-1)*120}px)`;
+          d.style.opacity='0';
+        });
+        setTimeout(()=>d.remove(), 950);
+      }
+    }
+
+    // UI helpers
+    function toggleInstructions(){
+      document.getElementById('instructionsPanel').classList.toggle('open');
+    }
+    async function setupEmergencyContacts(){
+      document.getElementById('contactModal').classList.add('open');
+    }
+    function closeContactModal(){
+      document.getElementById('contactModal').classList.remove('open');
+      document.getElementById('contactForm').reset();
+    }
+
+    // Contact form submission
+    document.getElementById('contactForm').addEventListener('submit', async function(e){
+      e.preventDefault();
+      const name = document.getElementById('contactName').value.trim();
+      const number = document.getElementById('contactNumber').value.trim();
+      const relation = document.getElementById('contactRelation').value.trim();
+
+      if (!name || !number || !relation) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/contacts/${window.chatApp.userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, number, relation })
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          window.chatApp.displayMessage(`✅ Emergency contact added: ${name} (${number})`, 'bot');
+          closeContactModal();
+        } else {
+          alert(`Failed to add contact: ${result.message}`);
+        }
+      } catch (error) {
+        alert(`Error adding contact: ${error.message}`);
+        console.error('Contact add error:', error);
+      }
+    });
+
+    // App init
+    document.addEventListener('DOMContentLoaded', () => {
+      window.chatApp = new TravelChatApp();
+      setTimeout(() => {
+        const container = document.querySelector('.container');
+        container.style.animation = 'floatSoft 9s var(--easing) infinite';
+      }, 800);
+    });
+
+    // Visibility handling
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && window.chatApp && window.chatApp.ws) {
+        // optional: throttle
+      } else if (!document.hidden && window.chatApp) {
+        if (!window.chatApp.ws || window.chatApp.ws.readyState !== WebSocket.OPEN) {
+          window.chatApp.connectWebSocket();
+        }
+      }
+    });
+
+    // Resize: keep scrolled to bottom
+    window.addEventListener('resize', () => {
+      if (window.chatApp) window.chatApp.scrollToBottom();
+    });
+
+    // Modal interactions
+    document.getElementById('contactModal').addEventListener('click', function(e){
+      if (e.target === this) closeContactModal();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeContactModal();
+    });
+
+    // Keyboard shortcut for instructions
+    document.addEventListener('keydown', function(e){
+      if (e.ctrlKey && e.key === '/') {
+        toggleInstructions();
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html

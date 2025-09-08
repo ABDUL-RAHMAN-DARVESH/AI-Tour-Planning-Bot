@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tour Bot - Smart Travel Planning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+
+
+        .nav {
+            padding: 15px 0;
+        }
+
+        .nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ff6b35;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff6b35;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: #FFF6F2;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-content {
+            text-align: left;
+            max-width: 600px;
+        }
+
+        .hero-sticker {
+            width: 100%;
+            height: 700px;
+            background-image: url('https://framerusercontent.com/images/APSbIv0MWvwKP97E4YZ1ZOUmEg.png?utm_source=chatgpt.com');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(48px, 6vw, 72px);
+            font-weight: 800;
+            margin-bottom: 32px;
+            line-height: 1.1;
+            color: #2c3e50;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .hero-btn.secondary {
+            background: transparent;
+            color: #ff6b35;
+            border: 2px solid #ff6b35;
+        }
+
+        .hero-btn.secondary:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .hero-image {
+            position: relative;
+            height: 600px;
+            width: 100%;
+            background-image: url('https://framerusercontent.com/images/APSbIv0MWvwKP97E4YZ1ZOUmEg.png?utm_source=chatgpt.com');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%);
+            border-radius: 60px 60px 60px 200px;
+            overflow: hidden;
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 147, 30, 0.1) 100%);
+            z-index: 1;
+        }
+
+        .hero-image::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            33% { transform: translateY(-8px) rotate(1deg) scale(1.02); }
+            66% { transform: translateY(5px) rotate(-0.5deg) scale(0.98); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .hero-image-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            color: white;
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-image-text {
+            font-size: 32px;
+            font-weight: 800;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .hero-image-subtext {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: white;
+            padding: 80px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .verified-badge {
+            background: #27ae60;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* About Section */
+        .about {
+            background: #f8f9fa;
+            padding: 100px 0;
+        }
+
+        .about .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            line-height: 1.2;
+        }
+
+        .about-features {
+            margin: 30px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: #ff6b35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .about p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .about-video {
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .about-video iframe {
+            width: 133%;
+            height: 133%;
+            position: absolute;
+            top: -16.5%;
+            left: -16.5%;
+            border-radius: 20px;
+            pointer-events: none;
+            transform: scale(1);
+        }
+
+        .about-video {
+            position: relative;
+        }
+
+        .about-video::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .service-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff6b35;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            margin: 0 auto 30px;
+        }
+
+        .service-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Destinations Section */
+        .destinations {
+            background: #f8f9fa;
+            padding: 100px 0;
+        }
+
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .destination-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .destination-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .destination-image {
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .destination-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .destination-card:hover .destination-image img {
+            transform: scale(1.1);
+        }
+
+        .destination-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,107,53,0.3), rgba(247,147,30,0.3));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .destination-card:hover .destination-overlay {
+            opacity: 1;
+        }
+
+        .destination-content {
+            padding: 30px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #f39c12;
+        }
+
+        .destination-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ff6b35;
+            margin-bottom: 20px;
+        }
+
+        .book-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Video Section */
+        .video-section {
+            padding: 0;
+            background: white;
+            width: 100%;
+        }
+
+        .video-container {
+            width: 100%;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .video-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .video-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.6);
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 30px;
+            text-align: center;
+            color: #bdc3c7;
+        }
+
+        /* Scrolling Marquee */
+        .marquee-section {
+            background: white;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 20s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-content span {
+            font-family: 'Inter', sans-serif;
+            font-size: 72px;
+            font-weight: 800;
+            color: transparent;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            margin-right: 100px;
+            flex-shrink: 0;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        @media (max-width: 768px) {
+            .marquee-content span {
+                font-size: 48px;
+                margin-right: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .marquee-content span {
+                font-size: 36px;
+                margin-right: 40px;
+            }
+        }
+
+        /* Why Choose Us Section */
+        .why-choose-us {
+            padding: 120px 0;
+            background: white;
+            overflow: hidden;
+        }
+
+        .why-choose-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .why-choose-text h2 {
+            font-size: 48px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .subheading {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .feature-point h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .feature-point p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .why-choose-images {
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rotating-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .central-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .framer-18671g2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .framer-1azw4d3 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: textRotate 20s linear infinite;
+            z-index: 1;
+        }
+
+        .rotating-badge {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            animation: rotate 30s linear infinite;
+        }
+
+        .rotating-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .rotating-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .icon-badge {
+            background: white;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 3px solid #ff6b35;
+        }
+
+        .badge-1 {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .badge-2 {
+            top: 25%;
+            right: 0;
+            animation-delay: -5s;
+        }
+
+        .badge-3 {
+            bottom: 25%;
+            right: 0;
+            animation-delay: -10s;
+        }
+
+        .badge-4 {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: -15s;
+        }
+
+        .badge-5 {
+            bottom: 25%;
+            left: 0;
+            animation-delay: -20s;
+        }
+
+        .badge-6 {
+            top: 25%;
+            left: 0;
+            animation-delay: -25s;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg) translateX(160px) rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg) translateX(160px) rotate(-360deg);
+            }
+        }
+
+        @keyframes centralRotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes textRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .why-choose-content {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+
+            .why-choose-text h2 {
+                font-size: 36px;
+            }
+
+            .rotating-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .central-badge {
+                width: 100px;
+                height: 100px;
+            }
+
+            .badge-icon {
+                font-size: 36px;
+            }
+
+            .rotating-badge {
+                width: 60px;
+                height: 60px;
+            }
+
+            .icon-badge {
+                font-size: 24px;
+            }
+
+            @keyframes rotate {
+                0% {
+                    transform: rotate(0deg) translateX(120px) rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+                }
+            }
+        }
+
+        /* Scrolling Text */
+        .scrolling-text {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 15px 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .scrolling-content {
+            display: inline-block;
+            animation: scroll 30s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-top {
+                display: none;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 60px 0;
+                min-height: auto;
+            }
+            
+            .hero .container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero-image {
+                height: 400px;
+                clip-path: polygon(0 0, 100% 0, 100% 85%, 15% 100%, 0 100%);
+                border-radius: 40px;
+            }
+            
+            .about .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header h2 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+
+        <nav class="nav">
+            <div class="container">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px; vertical-align: middle;">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#f7931e;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#logoGradient)" fill-rule="evenodd" d="m25.495 28.498-2.03 5.44c-.28.75-.717 1.439-1.253.871-.16-.168-.295-.395-.27-.644l.448-4.415a.069.069 0 0 1 .042-.058l2.97-1.283a.069.069 0 0 1 .075.014.07.07 0 0 1 .018.075Zm-3.851 11.168v1.513c0 .074.063.136.137.136h1.686a.138.138 0 0 0 .137-.136v-1.513a.07.07 0 0 0-.07-.07h-1.82a.07.07 0 0 0-.07.07Zm-9.247 0v1.513c0 .074.062.136.136.136h1.687a.138.138 0 0 0 .137-.136v-1.513a.07.07 0 0 0-.07-.07h-1.82a.07.07 0 0 0-.07.07ZM35.163 17.12c-.945-2.276-6.152-1.504-8.737-.977a.07.07 0 0 0-.055.058.07.07 0 0 0 .035.072c.283.158.533.37.738.62.016.02.04.03.067.024 1.661-.31 3.12-.457 4.297-.428 3.26.08 3.746 1.336 1.494 3.692-.616.644-1.414 1.33-2.366 2.039a.068.068 0 0 0-.028.064.069.069 0 0 0 .043.057l.818.345c.024.01.05.007.07-.009a18.842 18.842 0 0 0 2.122-1.869c1.343-1.405 1.917-2.688 1.502-3.688Zm-5.325 5.67a3.075 3.075 0 0 0-.974-.13c-.759.021-1.247.297-1.884.618a.068.068 0 0 1-.069-.003.068.068 0 0 1-.033-.06V19.14a2.568 2.568 0 0 0-2.562-2.561H11.685a2.568 2.568 0 0 0-2.562 2.561v12.308a.07.07 0 0 1-.057.069c-1.103.215-2.122.36-3.036.431-2.403.188-4.007-.102-4.35-.93-.286-.688.325-1.75 1.612-3.01 1.175-1.15 2.89-2.417 5.002-3.692a.068.068 0 0 0 .033-.06v-.895a.068.068 0 0 0-.035-.061.069.069 0 0 0-.07 0c-2.356 1.392-4.271 2.79-5.568 4.06C1.09 28.891.394 30.293.838 31.365c.515 1.24 2.447 1.711 5.26 1.49 2.16-.168 5.17-.931 7.979-1.804.057-.018.115-.032.17-.053.898-.344-.97-2.72-1.438-3.478a.068.068 0 0 1-.005-.064.068.068 0 0 1 .05-.04.11.11 0 0 1 .078.011l2.75 1.44c.612.319 1.241.523 1.856.212l10.413-5.267a2.156 2.156 0 0 1 1.89-.054l1.647.704a.176.176 0 0 1 0 .324c-7.226 3.122-14.523 6.966-22.308 8.451a.07.07 0 0 0-.057.069v3.055a2.568 2.568 0 0 0 2.561 2.561h12.632a2.568 2.568 0 0 0 2.562-2.561v-8.544c0-.028.016-.053.042-.064l4.928-2.13c.875-.377.873-1.624-.004-1.999l-1.001-.427h-.001l-.998-.404-.006-.003Zm-8.906-7.073v-4.602c0-.02.007-.036.021-.05a.068.068 0 0 1 .05-.02c.326 0 .597 0 .875-.277a.94.94 0 0 0 .276-.667V8.628a.945.945 0 0 0-.943-.943H14.79a.945.945 0 0 0-.943.943V10.1c0 .52.423.943.943.943h.208a.07.07 0 0 1 .07.07v4.603c0 .038.032.07.07.07h.773a.07.07 0 0 0 .07-.07v-4.602a.07.07 0 0 1 .07-.07h3.899a.07.07 0 0 1 .07.07v4.602c0 .038.032.07.07.07h.772a.07.07 0 0 0 .07-.07Zm-4.894 8.64a.078.078 0 0 0-.003-.001c-.649-.413-.371-.893.393-.679l.002.001 6.387 1.53a.07.07 0 0 1 .053.061.069.069 0 0 1-.039.07l-3.145 1.564a.069.069 0 0 1-.072-.005l-3.576-2.54Z" clip-rule="evenodd"/>
+                    </svg>
+                    AI Tour Bot
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#destinations">Destinations</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <a href="/classic" class="cta-btn">Chat Now</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Making India your playground</h1>
+                <p>Unrivaled AI expertise for unique travel experiences. We're here to take you to your dream destinations across incredible India</p>
+                <div class="hero-buttons">
+                    <a href="/classic" class="hero-btn">Let's Explore</a>
+                </div>
+            </div>
+            <div class="hero-sticker"></div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="verified-badge">100% AI Verified</span>
+                    <div class="stat-icon">🤖</div>
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">AI Recommendations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏛️</div>
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Indian Destinations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🗺️</div>
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Trip Plans Created</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏨</div>
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Hotel Partners</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <h2>Discover The Beauty of India</h2>
+                <div class="about-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">💰</div>
+                        <div>
+                            <strong>No Hidden Fees</strong><br>
+                            Transparent Pricing
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🆘</div>
+                        <div>
+                            <strong>24/7 AI Support</strong><br>
+                            Emergency Helpline
+                        </div>
+                    </div>
+                </div>
+                <p>AI Tour Bot is one of the most advanced AI travel assistants for those who want to explore India and create amazing adventures with intelligent recommendations.</p>
+                <a href="/classic" class="cta-btn">Get In Touch</a>
+            </div>
+            <div class="about-video">
+                <iframe width="100%" height="400" src="https://www.youtube.com/embed/dphagk4O5qA?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&rel=0&loop=1&playlist=dphagk4O5qA&disablekb=1&fs=0&iv_load_policy=3" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scrolling Marquee -->
+    <section class="marquee-section">
+        <div class="marquee">
+            <div class="marquee-content">
+                <span>Travel anywhere and anytime with Trips 🤖</span>
+                <span>Travel anywhere and anytime with Trips 🤖</span>
+                <span>Travel anywhere and anytime with Trips 🤖</span>
+                <span>Travel anywhere and anytime with Trips 🤖</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="why-choose-us">
+        <div class="container">
+            <div class="why-choose-content">
+                <div class="why-choose-text">
+                    <h2>Why Choose Us</h2>
+                    <p class="subheading">Experience the future of travel planning with our AI-powered platform that understands your unique preferences</p>
+                    <div class="features-list">
+                        <div class="feature-point">
+                            <h4>AI-Powered Intelligence</h4>
+                            <p>Advanced algorithms create personalized itineraries based on your travel style and preferences</p>
+                        </div>
+                        <div class="feature-point">
+                            <h4>Instant Planning</h4>
+                            <p>Get complete travel plans in seconds, not hours of research</p>
+                        </div>
+                        <div class="feature-point">
+                            <h4>Perfect Matches</h4>
+                            <p>Discover hidden gems and experiences tailored exactly to your interests</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="why-choose-images">
+                    <div class="rotating-container">
+                        <!-- Central Badge -->
+                        <div class="central-badge">
+                            <div class="framer-18671g2">
+                                <img src="https://framerusercontent.com/images/Cq6Cr0jHAo5SwZgOwvPkobTFWEQ.png" alt="Icon" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">
+                            </div>
+                            <div class="framer-1azw4d3">
+                                <img src="https://framerusercontent.com/images/DFY441GWzvfxUjypxKqpLO9vQ7c.png" alt="Text" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">
+                            </div>
+                        </div>
+                        
+                        <!-- Rotating Badges -->
+                        <div class="rotating-badge badge-1">
+                            <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="AI Planning">
+                        </div>
+                        
+                        <div class="rotating-badge badge-2">
+                            <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Rajasthan Palace">
+                        </div>
+                        
+                        <div class="rotating-badge badge-3">
+                            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Smart Travel">
+                        </div>
+                        
+                        <div class="rotating-badge badge-4">
+                            <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Kerala Backwaters">
+                        </div>
+                        
+                        <div class="rotating-badge badge-5">
+                            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Perfect Match">
+                        </div>
+                        
+                        <div class="rotating-badge badge-6">
+                            <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Goa Beach">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>World Class AI Services</h2>
+                <p>Which intelligent services we provide for your perfect Indian journey</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-number">01</div>
+                    <img src="https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Weather" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
+                    <h3>Real-time Weather</h3>
+                    <p>Get accurate weather forecasts for any Indian destination with AI-powered predictions</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-number">02</div>
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Hotel" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
+                    <h3>Smart Hotel Booking</h3>
+                    <p>AI recommends the best accommodations based on your preferences and budget</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-number">03</div>
+                    <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Trip Planning" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
+                    <h3>Intelligent Trip Planning</h3>
+                    <p>Our AI creates personalized itineraries tailored to your travel style and interests</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section id="destinations" class="destinations">
+        <div class="container">
+            <div class="section-header">
+                <h2>Most Popular AI Recommendations</h2>
+                <p>Top destinations recommended by our AI based on traveler preferences</p>
+            </div>
+            <div class="destinations-grid">
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Goa Beach">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <div class="rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span>4.9 AI Score (1000+ Reviews)</span>
+                        </div>
+                        <h3>Goa Beach Paradise: 5-Day Coastal Journey</h3>
+                        <div class="price">₹15,000 <small>/Person</small></div>
+                        <a href="/classic" class="book-btn">Plan Now</a>
+                    </div>
+                </div>
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Kerala Backwaters">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <div class="rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span>4.8 AI Score (800+ Reviews)</span>
+                        </div>
+                        <h3>Kerala Backwaters: 7-Day Cultural Experience</h3>
+                        <div class="price">₹25,000 <small>/Person</small></div>
+                        <a href="/classic" class="book-btn">Plan Now</a>
+                    </div>
+                </div>
+                <div class="destination-card">
+                    <div class="destination-image">
+                        <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Rajasthan Palace">
+                        <div class="destination-overlay"></div>
+                    </div>
+                    <div class="destination-content">
+                        <div class="rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span>4.9 AI Score (1200+ Reviews)</span>
+                        </div>
+                        <h3>Rajasthan Royal Tour: 10-Day Heritage Journey</h3>
+                        <div class="price">₹45,000 <small>/Person</small></div>
+                        <a href="/classic" class="book-btn">Plan Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <div class="video-container">
+            <video width="100%" height="600" autoplay muted loop>
+                <source src="https://framerusercontent.com/assets/vcDo4jaVBqJXArUO9845j1SDy8.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-overlay">
+                <a href="/classic" class="video-btn">Let's Explore</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 style="display: flex; align-items: center;">
+                        <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 10px;">
+                            <defs>
+                                <linearGradient id="footerLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#f7931e;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path fill="url(#footerLogoGradient)" fill-rule="evenodd" d="m25.495 28.498-2.03 5.44c-.28.75-.717 1.439-1.253.871-.16-.168-.295-.395-.27-.644l.448-4.415a.069.069 0 0 1 .042-.058l2.97-1.283a.069.069 0 0 1 .075.014.07.07 0 0 1 .018.075Zm-3.851 11.168v1.513c0 .074.063.136.137.136h1.686a.138.138 0 0 0 .137-.136v-1.513a.07.07 0 0 0-.07-.07h-1.82a.07.07 0 0 0-.07.07Zm-9.247 0v1.513c0 .074.062.136.136.136h1.687a.138.138 0 0 0 .137-.136v-1.513a.07.07 0 0 0-.07-.07h-1.82a.07.07 0 0 0-.07.07ZM35.163 17.12c-.945-2.276-6.152-1.504-8.737-.977a.07.07 0 0 0-.055.058.07.07 0 0 0 .035.072c.283.158.533.37.738.62.016.02.04.03.067.024 1.661-.31 3.12-.457 4.297-.428 3.26.08 3.746 1.336 1.494 3.692-.616.644-1.414 1.33-2.366 2.039a.068.068 0 0 0-.028.064.069.069 0 0 0 .043.057l.818.345c.024.01.05.007.07-.009a18.842 18.842 0 0 0 2.122-1.869c1.343-1.405 1.917-2.688 1.502-3.688Zm-5.325 5.67a3.075 3.075 0 0 0-.974-.13c-.759.021-1.247.297-1.884.618a.068.068 0 0 1-.069-.003.068.068 0 0 1-.033-.06V19.14a2.568 2.568 0 0 0-2.562-2.561H11.685a2.568 2.568 0 0 0-2.562 2.561v12.308a.07.07 0 0 1-.057.069c-1.103.215-2.122.36-3.036.431-2.403.188-4.007-.102-4.35-.93-.286-.688.325-1.75 1.612-3.01 1.175-1.15 2.89-2.417 5.002-3.692a.068.068 0 0 0 .033-.06v-.895a.068.068 0 0 0-.035-.061.069.069 0 0 0-.07 0c-2.356 1.392-4.271 2.79-5.568 4.06C1.09 28.891.394 30.293.838 31.365c.515 1.24 2.447 1.711 5.26 1.49 2.16-.168 5.17-.931 7.979-1.804.057-.018.115-.032.17-.053.898-.344-.97-2.72-1.438-3.478a.068.068 0 0 1-.005-.064.068.068 0 0 1 .05-.04.11.11 0 0 1 .078.011l2.75 1.44c.612.319 1.241.523 1.856.212l10.413-5.267a2.156 2.156 0 0 1 1.89-.054l1.647.704a.176.176 0 0 1 0 .324c-7.226 3.122-14.523 6.966-22.308 8.451a.07.07 0 0 0-.057.069v3.055a2.568 2.568 0 0 0 2.561 2.561h12.632a2.568 2.568 0 0 0 2.562-2.561v-8.544c0-.028.016-.053.042-.064l4.928-2.13c.875-.377.873-1.624-.004-1.999l-1.001-.427h-.001l-.998-.404-.006-.003Zm-8.906-7.073v-4.602c0-.02.007-.036.021-.05a.068.068 0 0 1 .05-.02c.326 0 .597 0 .875-.277a.94.94 0 0 0 .276-.667V8.628a.945.945 0 0 0-.943-.943H14.79a.945.945 0 0 0-.943.943V10.1c0 .52.423.943.943.943h.208a.07.07 0 0 1 .07.07v4.603c0 .038.032.07.07.07h.773a.07.07 0 0 0 .07-.07v-4.602a.07.07 0 0 1 .07-.07h3.899a.07.07 0 0 1 .07.07v4.602c0 .038.032.07.07.07h.772a.07.07 0 0 0 .07-.07Zm-4.894 8.64a.078.078 0 0 0-.003-.001c-.649-.413-.371-.893.393-.679l.002.001 6.387 1.53a.07.07 0 0 1 .053.061.069.069 0 0 1-.039.07l-3.145 1.564a.069.069 0 0 1-.072-.005l-3.576-2.54Z" clip-rule="evenodd"/>
+                        </svg>
+                        AI Tour Bot
+                    </h3>
+                    <p>Your intelligent travel companion for exploring incredible India with AI-powered recommendations and personalized trip planning.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#destinations">Destinations</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>AI Services</h3>
+                    <ul>
+                        <li><a href="/classic">Weather Forecasts</a></li>
+                        <li><a href="/classic">Hotel Booking</a></li>
+                        <li><a href="/classic">Trip Planning</a></li>
+                        <li><a href="/classic">Budget Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li>📧 abdulrahmandarvesh56@gmail.com</li>
+                        <li>📞 +91 9597242294</li>
+                        <li>🌐 Available 24/7</li>
+                        <li>🤖 AI-Powered Support</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI Tour Bot. Your intelligent travel companion for India.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Image lazy loading and error handling
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.opacity = '0.5';
+                this.alt = 'Image not available';
+            });
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            }
+        });
+    </script>
+</body>
+</html>
