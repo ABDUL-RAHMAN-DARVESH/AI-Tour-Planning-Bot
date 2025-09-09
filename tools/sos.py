@@ -26,9 +26,14 @@ except ImportError:
 
 load_dotenv()
 
-# WhatsApp disabled for deployment
-WHATSAPP_AVAILABLE = False
-print("WhatsApp functionality disabled for cloud deployment")
+# Import pywhatkit with error handling
+try:
+    import pywhatkit as kit
+    WHATSAPP_AVAILABLE = True
+    print("WhatsApp integration available via pywhatkit")
+except ImportError:
+    WHATSAPP_AVAILABLE = False
+    print("Warning: pywhatkit not available - WhatsApp sending will be simulated")
 
 @dataclass
 class Contact:
@@ -129,9 +134,9 @@ class WhatsAppSender:
     def send(contact: Contact, message: str) -> SendResult:
         try:
             if not WHATSAPP_AVAILABLE:
-                # Simulate sending for testing mode
-                print(f"📱 SIMULATED WhatsApp to {contact.name} ({contact.number}):")
-                print(f"📄 Message: {message[:100]}...")
+                # Simulate sending for testing
+                print(f"SIMULATED WhatsApp to {contact.name} ({contact.number}):")
+                print(f"Message: {message}")
                 print("-" * 50)
                 return SendResult(
                     contact=contact.name, 
@@ -140,25 +145,22 @@ class WhatsAppSender:
                     error_message=None
                 )
             
-            print(f"📱 Sending WhatsApp via Twilio to {contact.name} ({contact.number})")
+            print(f"Attempting to send WhatsApp to {contact.name} ({contact.number})")
             
-            # Use Twilio WhatsApp API
-            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-            
-            # Format number for WhatsApp
-            whatsapp_to = f"whatsapp:{contact.number}"
-            
-            message_instance = client.messages.create(
-                body=message,
-                from_=TWILIO_WHATSAPP_FROM,
-                to=whatsapp_to
+            # Use pywhatkit to send immediately
+            kit.sendwhatmsg_instantly(
+                phone_no=contact.number,
+                message=message,
+                wait_time=15,  # Wait 15 seconds for WhatsApp to load
+                tab_close=True,
+                close_time=5   # Close tab after 5 seconds
             )
             
-            print(f"WhatsApp sent successfully to {contact.name} (SID: {message_instance.sid})")
+            print(f"WhatsApp sent successfully to {contact.name}")
             return SendResult(
                 contact=contact.name, 
                 status="success", 
-                method="twilio",
+                method="pywhatkit",
                 error_message=None
             )
             
@@ -167,7 +169,7 @@ class WhatsAppSender:
             return SendResult(
                 contact=contact.name, 
                 status="failed", 
-                method="twilio",
+                method="whatsapp",
                 error_message=str(e)
             )
 
