@@ -26,22 +26,9 @@ except ImportError:
 
 load_dotenv()
 
-# Import Twilio for WhatsApp messaging
-try:
-    from twilio.rest import Client
-    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-    TWILIO_WHATSAPP_FROM = os.getenv('TWILIO_PHONE_NUMBER', 'whatsapp:+14155238886')
-    
-    if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
-        WHATSAPP_AVAILABLE = True
-        print("WhatsApp integration available via Twilio")
-    else:
-        WHATSAPP_AVAILABLE = False
-        print("Twilio credentials not found - WhatsApp sending will be simulated")
-except ImportError as e:
-    WHATSAPP_AVAILABLE = False
-    print(f"Warning: Twilio not available - {e}")
+# WhatsApp disabled for deployment
+WHATSAPP_AVAILABLE = False
+print("WhatsApp functionality disabled for cloud deployment")
 
 @dataclass
 class Contact:

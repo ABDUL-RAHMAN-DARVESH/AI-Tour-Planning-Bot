@@ -15,4 +15,3 @@ pydantic
 pydantic-settings
 httpx
 geopy
-twilio
