@@ -14,4 +14,6 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://huggingface:$HF_TOKEN@huggingface.co/spaces/ABDUL-RAHMAN-DARVESH/ai-tour-planning-bot main
+        run: |
+          git remote add hf https://huggingface:$HF_TOKEN@huggingface.co/spaces/ABDUL-RAHMAN-DARVESH/ai-tour-planning-bot
+          git push hf main --force
