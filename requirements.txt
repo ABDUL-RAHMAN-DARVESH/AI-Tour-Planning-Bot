@@ -15,4 +15,4 @@ pydantic
 pydantic-settings
 httpx
 geopy
-pywhatkit
+twilio
