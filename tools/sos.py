@@ -63,7 +63,7 @@ class Contact:
     number: str
     relation: str
     
-    def _post_init_(self):
+    def __post_init__(self):
         self.number = self._normalize_number(self.number)
     
     def _normalize_number(self, number: str) -> str:
@@ -85,7 +85,7 @@ class SOSMessage:
     location: Optional[str] = None
     timestamp: Optional[str] = None
     
-    def _post_init_(self):
+    def __post_init__(self):
         if not self.timestamp:
             self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -98,7 +98,7 @@ class SendResult:
 
 class ContactsRepository:
     """Local file fallback for contacts storage."""
-    def _init_(self, file_path: str = "emergency_contacts.json"):
+    def __init__(self, file_path: str = "emergency_contacts.json"):
         self.file_path = file_path
         # Ensure directory exists
         os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
@@ -197,14 +197,14 @@ class WhatsAppSender:
 
 class SOSSystem:
     """Main SOS system coordinating contacts and messaging."""
-    def _init_(self):
+    def __init__(self):
         self.contacts_repo = ContactsRepository()
         self.message_composer = MessageComposer()
     
     async def save_contacts(self, contact1_data: Dict, contact2_data: Dict, user_id: Optional[str] = None) -> str:
         """Save two emergency contacts."""
         try:
-            contacts = [Contact(*contact1_data), Contact(*contact2_data)]
+            contacts = [Contact(**contact1_data), Contact(**contact2_data)]
             
             if user_id:
                 try:
@@ -260,151 +260,28 @@ class SOSSystem:
             print(error_msg)
             return error_msg
         
-        # Create and send SOS messages
-        print("Creating SOS message")
+        # Create SOS message
         sos_message = self.message_composer.create_sos_message(user_message, user_location)
-        results = []
         
-        print(f"Sending SOS to {len(contacts_list)} contacts")
-        for i, contact in enumerate(contacts_list, 1):
+        # Send to all contacts
+        results = []
+        for contact in contacts_list:
             try:
-                print(f"Sending to contact {i}/{len(contacts_list)}: {contact.name}")
                 formatted_message = self.message_composer.format_whatsapp_message(sos_message, contact)
                 result = WhatsAppSender.send(contact, formatted_message)
                 results.append(result)
-                print(f"Result: {result.status} for {contact.name}")
-                
-                # Add delay between messages to avoid rate limiting
-                if i < len(contacts_list):
-                    await asyncio.sleep(2)
-                    
+                print(f"SOS sent to {contact.name}: {result.status}")
             except Exception as e:
-                print(f"Exception sending to {contact.name}: {e}")
-                results.append(SendResult(
-                    contact=contact.name, 
-                    status="failed", 
-                    method="whatsapp",
-                    error_message=str(e)
-                ))
+                print(f"Error sending SOS to {contact.name}: {e}")
+                results.append(SendResult(contact.name, "failed", "error", str(e)))
         
-        # Create summary
+        # Format response
         success_count = sum(1 for r in results if r.status == "success")
         total_count = len(results)
         
-        summary_lines = []
-        for result in results:
-            if result.status == "success":
-                summary_lines.append(f"✅ {result.contact}")
-            else:
-                summary_lines.append(f"❌ {result.contact} - {result.error_message or 'Failed'}")
-        
-        summary = f"🚨 SOS Alert Results ({success_count}/{total_count} sent)\n" + "\n".join(summary_lines)
-        print(f"SOS Summary: {summary}")
-        return summary
-
-# Helper functions for tool integration
-async def add_single_contact(user_id: str, contact_data: Dict) -> str:
-    """Add single emergency contact via MongoDB."""
-    try:
-        contact = Contact(**contact_data)
-        await mongo_add_contact(user_id, {
-            "name": contact.name, 
-            "number": contact.number, 
-            "relation": contact.relation
-        })
-        return f"✅ Added {contact.name} ({contact.number}) to emergency contacts."
-    except Exception as e:
-        print(f"Error adding contact: {e}")
-        return f"❌ Failed to add contact: {str(e)}"
-
-async def list_contacts(user_id: str) -> str:
-    """List all emergency contacts for user."""
-    try:
-        records = await mongo_list_contacts(user_id)
-        if not records:
-            return "⚠ No emergency contacts found. Use the Setup SOS button to add contacts."
-        
-        output = ["📒 Your Emergency Contacts:"]
-        for i, contact in enumerate(records, 1):
-            output.append(f"{i}. {contact.get('name')} – {contact.get('number')} ({contact.get('relation', 'contact')})")
-        
-        return "\n".join(output)
-    except Exception as e:
-        print(f"Error listing contacts: {e}")
-        return f"❌ Error retrieving contacts: {str(e)}"
-
-async def handle_sos_workflow(user_id: str = "default_user", interactive: bool = True) -> str:
-    """Handle SOS workflow - can be called from agent or standalone."""
-    sos = SOSSystem()
-    
-    # Check if emergency contacts exist
-    try:
-        contacts = await mongo_list_contacts(user_id)
-    except Exception as e:
-        if interactive:
-            print(f"⚠ Database connection issue: {e}")
-            print("Using local file storage instead...")
-        contacts = []
-    
-    # Check local file if no DB contacts
-    if not contacts:
-        local_contacts = sos.contacts_repo.load()
-        if local_contacts:
-            contacts = [{"name": c.name, "number": c.number, "relation": c.relation} for c in local_contacts]
-    
-    if not contacts:
-        if not interactive:
-            return "❌ No emergency contacts found. Please add contacts first."
-        
-        print("\n⚠ No emergency contacts found.")
-        print("Please add emergency contacts first:\n")
-        
-        # Get contacts
-        name1 = input("First Contact Name: ").strip()
-        number1 = input("Phone Number: ").strip()
-        relation1 = input("Relation: ").strip()
-        
-        name2 = input("\nSecond Contact Name: ").strip()
-        number2 = input("Phone Number: ").strip()
-        relation2 = input("Relation: ").strip()
-        
-        # Save contacts
-        contact1_data = {"name": name1, "number": number1, "relation": relation1}
-        contact2_data = {"name": name2, "number": number2, "relation": relation2}
-        
-        result = await sos.save_contacts(contact1_data, contact2_data, user_id)
-        print(result)
-    
-    # Get SOS message and location
-    if interactive:
-        print("\n📍 SOS Details:")
-        location = input("Current Location (optional): ").strip() or None
-        message = input("Emergency Message (optional): ").strip() or None
-    else:
-        location = None
-        message = None
-    
-    # Send SOS
-    if interactive:
-        print("\n🚨 Sending SOS Alert...")
-    
-    try:
-        result = await sos.trigger_sos(location, message, user_id)
-    except Exception as e:
-        error_msg = f"❌ SOS failed: {str(e)}"
-        if interactive:
-            print(f"⚠ SOS sending failed: {e}")
-        result = error_msg
-    
-    if interactive:
-        print(f"\n{result}")
-    
-    return result
-
-async def main():
-    """Main function for standalone execution."""
-    print("🚨 Emergency SOS System 🚨")
-    await handle_sos_workflow("default_user", interactive=True)
-
-if _name_ == "_main_":
-    asyncio.run(main())
+        if success_count == 0:
+            return f"❌ Failed to send SOS to all {total_count} contacts. Please check your contacts and try again."
+        elif success_count == total_count:
+            return f"✅ SOS alert sent successfully to all {total_count} emergency contacts!"
+        else:
+            return f"⚠️ SOS alert sent to {success_count} out of {total_count} contacts. Some messages may have failed."
