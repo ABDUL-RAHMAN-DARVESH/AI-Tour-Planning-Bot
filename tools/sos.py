@@ -10,7 +10,7 @@ from typing import List, Dict, Optional
 from dotenv import load_dotenv
 
 # Add parent directory to path for db imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(_file_))))
 
 try:
     from db.mongo import add_contact as mongo_add_contact, list_contacts as mongo_list_contacts
@@ -23,6 +23,28 @@ except ImportError:
     async def mongo_list_contacts(user_id):
         print(f"MongoDB fallback: Would list contacts for user {user_id}")
         return []
+
+# Fix missing functions
+async def add_single_contact(user_id: str, contact_data: dict) -> str:
+    """Add a single emergency contact."""
+    try:
+        await mongo_add_contact(user_id, contact_data)
+        return f"✅ Contact {contact_data['name']} added successfully!"
+    except Exception as e:
+        return f"❌ Failed to add contact: {str(e)}"
+
+async def list_contacts(user_id: str) -> str:
+    """List all contacts for a user."""
+    try:
+        contacts = await mongo_list_contacts(user_id)
+        if not contacts:
+            return "No emergency contacts found."
+        result = "📞 Your Emergency Contacts:\n"
+        for i, contact in enumerate(contacts, 1):
+            result += f"{i}. {contact['name']} ({contact['relation']}) - {contact['number']}\n"
+        return result
+    except Exception as e:
+        return f"❌ Error retrieving contacts: {str(e)}"
 
 load_dotenv()
 
@@ -41,7 +63,7 @@ class Contact:
     number: str
     relation: str
     
-    def __post_init__(self):
+    def _post_init_(self):
         self.number = self._normalize_number(self.number)
     
     def _normalize_number(self, number: str) -> str:
@@ -63,7 +85,7 @@ class SOSMessage:
     location: Optional[str] = None
     timestamp: Optional[str] = None
     
-    def __post_init__(self):
+    def _post_init_(self):
         if not self.timestamp:
             self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -76,7 +98,7 @@ class SendResult:
 
 class ContactsRepository:
     """Local file fallback for contacts storage."""
-    def __init__(self, file_path: str = "emergency_contacts.json"):
+    def _init_(self, file_path: str = "emergency_contacts.json"):
         self.file_path = file_path
         # Ensure directory exists
         os.makedirs(os.path.dirname(os.path.abspath(file_path)), exist_ok=True)
@@ -120,7 +142,7 @@ class MessageComposer:
 👤 Emergency Contact: {contact.name} ({contact.relation})
 🤖 AI Travel Guide Emergency System
 
-⚠️ This is an automated emergency alert. Please respond immediately or contact emergency services if needed."""
+⚠ This is an automated emergency alert. Please respond immediately or contact emergency services if needed."""
         
         if sos_message.location:
             msg += f"\n📍 Last Known Location: {sos_message.location}"
@@ -175,14 +197,14 @@ class WhatsAppSender:
 
 class SOSSystem:
     """Main SOS system coordinating contacts and messaging."""
-    def __init__(self):
+    def _init_(self):
         self.contacts_repo = ContactsRepository()
         self.message_composer = MessageComposer()
     
     async def save_contacts(self, contact1_data: Dict, contact2_data: Dict, user_id: Optional[str] = None) -> str:
         """Save two emergency contacts."""
         try:
-            contacts = [Contact(**contact1_data), Contact(**contact2_data)]
+            contacts = [Contact(*contact1_data), Contact(*contact2_data)]
             
             if user_id:
                 try:
@@ -300,7 +322,7 @@ async def list_contacts(user_id: str) -> str:
     try:
         records = await mongo_list_contacts(user_id)
         if not records:
-            return "⚠️ No emergency contacts found. Use the Setup SOS button to add contacts."
+            return "⚠ No emergency contacts found. Use the Setup SOS button to add contacts."
         
         output = ["📒 Your Emergency Contacts:"]
         for i, contact in enumerate(records, 1):
@@ -320,7 +342,7 @@ async def handle_sos_workflow(user_id: str = "default_user", interactive: bool =
         contacts = await mongo_list_contacts(user_id)
     except Exception as e:
         if interactive:
-            print(f"⚠️ Database connection issue: {e}")
+            print(f"⚠ Database connection issue: {e}")
             print("Using local file storage instead...")
         contacts = []
     
@@ -334,7 +356,7 @@ async def handle_sos_workflow(user_id: str = "default_user", interactive: bool =
         if not interactive:
             return "❌ No emergency contacts found. Please add contacts first."
         
-        print("\n⚠️ No emergency contacts found.")
+        print("\n⚠ No emergency contacts found.")
         print("Please add emergency contacts first:\n")
         
         # Get contacts
@@ -371,7 +393,7 @@ async def handle_sos_workflow(user_id: str = "default_user", interactive: bool =
     except Exception as e:
         error_msg = f"❌ SOS failed: {str(e)}"
         if interactive:
-            print(f"⚠️ SOS sending failed: {e}")
+            print(f"⚠ SOS sending failed: {e}")
         result = error_msg
     
     if interactive:
@@ -384,5 +406,5 @@ async def main():
     print("🚨 Emergency SOS System 🚨")
     await handle_sos_workflow("default_user", interactive=True)
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     asyncio.run(main())

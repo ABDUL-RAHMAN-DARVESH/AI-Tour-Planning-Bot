@@ -19,7 +19,12 @@ from tools.maps import get_maps
 from tools.booking import get_booking
 from tools.images import get_images
 from tools.news import get_news
-from tools.sos import SOSSystem
+try:
+    from tools.sos import SOSSystem
+except ImportError:
+    class SOSSystem:
+        async def trigger_sos(self, *args, **kwargs):
+            return "SOS system not available"
 from tool_integration import tool_integrator, integrate_tools_for_trip_planning, format_psychology_aware_response
 
 from prompts.prompts import get_trip_agent_prompt

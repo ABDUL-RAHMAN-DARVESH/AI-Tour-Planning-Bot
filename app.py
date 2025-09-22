@@ -13,7 +13,16 @@ from trip_agent import create_trip_agent
 from db.mongo import upsert_user_location, get_user_location
 
 # Updated import path for SOS system
-from tools.sos import SOSSystem, add_single_contact
+try:
+    from tools.sos import SOSSystem
+    from tools.sos import add_single_contact
+except ImportError as e:
+    print(f"Warning: SOS system import failed: {e}")
+    class SOSSystem:
+        async def trigger_sos(self, *args, **kwargs):
+            return "SOS system not available"
+    async def add_single_contact(*args, **kwargs):
+        return "Contact system not available"
 
 import uvicorn
 import sys
